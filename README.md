@@ -1,13 +1,27 @@
-# Sample Hardhat Project
+# Flash Loan Arbitrage Bot
 
-This project demonstrates a basic Hardhat use case. It comes with a sample contract, a test for that contract, and a Hardhat Ignition module that deploys that contract.
+A DeFi flash loan arbitrage bot built with Solidity and Hardhat.
 
-Try running some of the following tasks:
+## What it does
+- Borrows millions in crypto with zero collateral using Aave flash loans
+- Detects price differences between DEX A and DEX B
+- Automatically executes arbitrage trades for profit
+- Repays the loan in the same transaction
 
-```shell
-npx hardhat help
-npx hardhat test
-REPORT_GAS=true npx hardhat test
-npx hardhat node
-npx hardhat ignition deploy ./ignition/modules/Lock.js
+## Tech Stack
+- Solidity (Smart Contracts)
+- Hardhat (Development Framework)
+- Ethers.js (Blockchain Interaction)
+- Node.js (Bot)
+
+## Results
+- Bot scanned 15 market opportunities
+- Found 4 profitable trades
+- Total profit: 3,800 mUSDC
+
+## How to run
+```bash
+npm install
+npx hardhat compile
+node bot/index.js
 ```
