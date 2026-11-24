@@ -9,24 +9,10 @@ function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function getPrice(coinId) {
-  try {
-    const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=${coinId}&vs_currencies=usd`,
-      { headers: { "Accept": "application/json" } }
-    );
-    const data = await response.json();
-    return data[coinId]?.usd || null;
-  } catch (err) {
-    return null;
-  }
-}
-
 async function getAllPrices() {
   try {
-    // Fetch all prices in ONE request to avoid rate limiting
     const response = await fetch(
-      `https://api.coingecko.com/api/v3/simple/price?ids=ethereum,wrapped-bitcoin,binancecoin,matic-network&vs_currencies=usd`,
+      `https://api.coingecko.com/api/v3/simple/price?ids=ethereum,wrapped-bitcoin,binancecoin,matic-network,solana,avalanche-2,arbitrum,chainlink,uniswap,dogecoin&vs_currencies=usd`,
       { headers: { "Accept": "application/json" } }
     );
     const data = await response.json();
@@ -34,7 +20,13 @@ async function getAllPrices() {
       ETH:   data["ethereum"]?.usd || null,
       WBTC:  data["wrapped-bitcoin"]?.usd || null,
       BNB:   data["binancecoin"]?.usd || null,
-      MATIC: data["matic-network"]?.usd || null
+      MATIC: data["matic-network"]?.usd || null,
+      SOL:   data["solana"]?.usd || null,
+      AVAX:  data["avalanche-2"]?.usd || null,
+      ARB:   data["arbitrum"]?.usd || null,
+      LINK:  data["chainlink"]?.usd || null,
+      UNI:   data["uniswap"]?.usd || null,
+      DOGE:  data["dogecoin"]?.usd || null
     };
   } catch (err) {
     console.log("   ⚠️ Price fetch failed, retrying next scan...");
@@ -102,7 +94,7 @@ async function scanAndTrade(flashLoan, token, prices) {
       ? "Uniswap→Sushiswap"
       : "Sushiswap→Uniswap";
 
-    console.log(`   ${name}: $${price.toFixed(2)} | Diff: ${diffPercent.toFixed(4)}% | Profit: $${netProfitUSD.toFixed(2)}`);
+    console.log(`   ${name}: $${price.toFixed(4)} | Diff: ${diffPercent.toFixed(4)}% | Profit: $${netProfitUSD.toFixed(2)}`);
 
     if (diffPercent > MIN_PROFIT_PERCENT && netProfitUSD > 0) {
       console.log(`   🚨 OPPORTUNITY: ${direction}`);
@@ -126,6 +118,7 @@ async function scanAndTrade(flashLoan, token, prices) {
 async function runRealBot() {
   console.log("🤖 Real Flash Loan Arbitrage Bot");
   console.log("📡 Live prices from CoinGecko");
+  console.log("💱 Trading pairs: ETH, WBTC, BNB, MATIC, SOL, AVAX, ARB, LINK, UNI, DOGE");
   console.log("⛓️  Executing on local Hardhat network\n");
 
   console.log("Deploying contracts...");
@@ -136,7 +129,7 @@ async function runRealBot() {
   let scanCount = 0;
   let tradesExecuted = 0;
 
-  console.log("🔍 Scanning every 15 seconds (CoinGecko rate limit friendly)\n");
+  console.log("🔍 Scanning every 15 seconds...\n");
   console.log("─────────────────────────────────────────────");
 
   async function scan() {
@@ -150,6 +143,7 @@ async function runRealBot() {
       if (profit > 0) {
         totalProfit += profit;
         tradesExecuted++;
+        console.log(`\n💰 Scan profit: ${profit} mUSDC | Total: ${totalProfit} mUSDC`);
       }
     }
 
@@ -164,7 +158,6 @@ async function runRealBot() {
       return;
     }
 
-    // Wait 15 seconds before next scan
     await sleep(15000);
     await scan();
   }
