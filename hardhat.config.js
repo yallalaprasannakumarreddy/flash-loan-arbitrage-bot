@@ -7,7 +7,7 @@ module.exports = {
     sepolia: {
       url: process.env.SEPOLIA_RPC,
       accounts: [process.env.PRIVATE_KEY],
-      gasPrice: 3000000000, // 3 gwei - much lower
+      gasPrice: 1000000000, // 1 gwei - minimum
     }
   }
 };
